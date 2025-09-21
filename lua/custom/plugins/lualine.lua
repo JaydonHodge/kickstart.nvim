@@ -31,6 +31,7 @@ return {
     end
 
     -- Custom colours
+    local custom_catppuccin = require 'lualine.themes.catppuccin-mocha'
     -- custom_catppuccin.normal.b.fg = '#cad3f5'
     -- custom_catppuccin.insert.b.fg = '#cad3f5'
     -- custom_catppuccin.visual.b.fg = '#cad3f5'
@@ -39,10 +40,11 @@ return {
     -- custom_catppuccin.inactive.b.fg = '#cad3f5'
     --
     -- custom_catppuccin.normal.c.fg = '#6e738d'
-    -- custom_catppuccin.normal.c.bg = '#1e2030'
+    custom_catppuccin.normal.c.bg = '#313244'
 
     require('lualine').setup {
       options = {
+        theme = custom_catppuccin,
         component_separators = '',
         section_separators = { left = '', right = '' },
         disabled_filetypes = { 'alpha', 'Outline' },
@@ -55,30 +57,44 @@ return {
           {
             'branch',
             icon = '',
+            color = { fg = '#a6adc8', bg = '#45475a' },
+            separator = { left = '', right = '' },
           },
-          {
-            'diff',
-            symbols = { added = '+', modified = '~', removed = '-' },
-            colored = false,
-          },
+          -- {
+          --   'diff',
+          --   symbols = { added = '+', modified = '~', removed = '-' },
+          --   color = { fg = '#11111b', bg = '#b0cbf7' },
+          --   colored = false,
+          --   separator = { left = '', right = '' },
+          -- },
         },
         lualine_c = {
           {
             'pretty_path',
             highlights = {
-              modified = { fg = '#87a987', bold = true, italic = true },
+              modified = { fg = '#a6e3a1', bold = true, italic = true },
             },
           },
         },
         lualine_x = {
           {
             'diagnostics',
-            symbols = { error = '', warn = '', info = '󰙎 ', hint = ' ' },
+            symbols = { error = ' ', warn = ' ', info = '󰙎 ', hint = ' ' },
             update_in_insert = true,
           },
         },
-        lualine_y = { clients_lsp },
-        lualine_z = {},
+        lualine_y = {
+          {
+            clients_lsp,
+            color = { fg = '#11111b', bg = '#eba0ac' },
+          },
+        },
+        lualine_z = {
+          {
+            'progress',
+            color = { fg = '#11111b', bg = '#f2cdcd' },
+          },
+        },
       },
       -- tabline = {
       --   lualine_a = {

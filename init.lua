@@ -213,6 +213,16 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+-- Insert blank line below and move cursor into it
+vim.keymap.set('n', '<CR>', function()
+  local count = vim.v.count1
+  local row = vim.api.nvim_win_get_cursor(0)[1]
+  -- insert blank lines below current
+  vim.fn.append(row, '')
+  -- move cursor to the first of new lines
+  vim.api.nvim_win_set_cursor(0, { row + 1, 0 })
+end, { desc = 'Add blank line(s) below and jump in', silent = true })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -642,7 +652,7 @@ require('lazy').setup({
 
       -- Change diagnostic symbols in the sign column (gutter)
       if vim.g.have_nerd_font then
-        local signs = { ERROR = '', WARN = '', INFO = '', HINT = '' }
+        local signs = { ERROR = '⎜', WARN = '󰀧', INFO = '󰋼', HINT = '' } --󰍵
         local diagnostic_signs = {}
         for type, icon in pairs(signs) do
           diagnostic_signs[vim.diagnostic.severity[type]] = icon
@@ -843,9 +853,9 @@ require('lazy').setup({
         -- No, but seriously. Please read `:help ins-completion`, it is really good!
         mapping = cmp.mapping.preset.insert {
           -- Select the [n]ext item
-          ['<C-n>'] = cmp.mapping.select_next_item(),
+          --['<C-n>'] = cmp.mapping.select_next_item(),
           -- Select the [p]revious item
-          ['<C-p>'] = cmp.mapping.select_prev_item(),
+          --['<C-p>'] = cmp.mapping.select_prev_item(),
 
           -- Scroll the documentation window [b]ack / [f]orward
           ['<C-b>'] = cmp.mapping.scroll_docs(-4),
@@ -854,13 +864,13 @@ require('lazy').setup({
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
-          ['<C-y>'] = cmp.mapping.confirm { select = true },
+          --['<C-y>'] = cmp.mapping.confirm { select = true },
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
-          --['<CR>'] = cmp.mapping.confirm { select = true },
-          --['<Tab>'] = cmp.mapping.select_next_item(),
-          --['<S-Tab>'] = cmp.mapping.select_prev_item(),
+          ['<CR>'] = cmp.mapping.confirm { select = true },
+          ['<Tab>'] = cmp.mapping.select_next_item(),
+          ['<S-Tab>'] = cmp.mapping.select_prev_item(),
 
           -- Manually trigger a completion from nvim-cmp.
           --  Generally you don't need this, because nvim-cmp will display
@@ -932,14 +942,17 @@ require('lazy').setup({
       --vim.cmd.colorscheme 'tokyonight-night'
 
       -- Gruvbox
-      vim.g.gruvbox_material_enable_italic = true
-      vim.g.gruvbox_material_disable_italic_comment = '0'
-      vim.g.gruvbox_material_foreground = 'material'
-      vim.g.gruvbox_material_background = 'hard'
+      -- vim.g.gruvbox_material_enable_italic = true
+      -- vim.g.gruvbox_material_disable_italic_comment = '0'
+      -- vim.g.gruvbox_material_foreground = 'material'
+      -- vim.g.gruvbox_material_background = 'hard'
       -- vim.cmd.colorscheme 'gruvbox-material'
 
       -- Kanagawa
-      vim.cmd.colorscheme 'kanagawa-dragon'
+      --vim.cmd.colorscheme 'kanagawa-dragon'
+
+      -- Zenbones
+      vim.cmd.colorscheme 'neobones'
 
       -- Everforest
 
@@ -1117,10 +1130,49 @@ end
 
 -- Choose and set your theme here
 if vim.opt.background:get() == 'dark' then
-  vim.cmd 'colorscheme kanagawa-dragon'
+  --vim.cmd 'colorscheme kanagawa-dragon'
+  vim.cmd 'colorscheme catppuccin'
+  -- Below settings for catppuccin
+
+  vim.api.nvim_set_hl(0, 'Comment', { fg = '#6c7086' })
+
+  -- Below settings for zenbones
+  -- vim.cmd 'colorscheme zenbones'
+  -- vim.api.nvim_set_hl(0, 'Number', { fg = '#ac7085' })
+  --vim.api.nvim_set_hl(0, 'Statement', { fg = '#859fac', bold = true })
+  --vim.api.nvim_set_hl(0, 'String', { fg = '#6d7d73' })
+  --vim.api.nvim_set_hl(0, 'Special', { fg = '#c4746e' })
+  -- vim.api.nvim_set_hl(0, 'Comment', { fg = '#524c49' })
+  -- vim.api.nvim_set_hl(0, 'Constant', { fg = '#6b8e9c', italic = true })
 else
-  vim.cmd 'colorscheme kanagawa-paper-canvas'
+  --vim.cmd 'colorscheme kanagawa-paper-canvas'
+  vim.o.background = 'light'
+  -- Below settings are for catppuccin
+  vim.cmd 'colorscheme catppuccin'
+  vim.api.nvim_set_hl(0, 'Special', { fg = '#5c71a4' })
+
+  -- Below settings for zenbones
+  -- vim.cmd 'colorscheme zenbones'
+  --vim.api.nvim_set_hl(0, 'Number', { fg = '#cc859e' })
+  -- vim.api.nvim_set_hl(0, 'String', { fg = '#5f847c' })
+  -- vim.api.nvim_set_hl(0, 'Comment', { fg = '#a9a8a0' })
+  -- vim.api.nvim_set_hl(0, 'Number', { fg = '#b577aa' })
+  -- vim.api.nvim_set_hl(0, 'Statement', { fg = '#5f8a9b', bold = true })
+  -- vim.api.nvim_set_hl(0, 'Special', { fg = '#5c71a4' })
 end
+
+-- Save whenever background changes
+vim.api.nvim_create_autocmd('OptionSet', {
+  pattern = 'background',
+  callback = function()
+    local bg = vim.opt.background:get()
+    local f = io.open(bg_file, 'w')
+    if f then
+      f:write(bg)
+      f:close()
+    end
+  end,
+})
 
 -- Save on exit
 vim.api.nvim_create_autocmd('VimLeavePre', {
@@ -1132,3 +1184,6 @@ vim.api.nvim_create_autocmd('VimLeavePre', {
     end
   end,
 })
+
+vim.opt.laststatus = 3
+vim.opt.cmdheight = 0

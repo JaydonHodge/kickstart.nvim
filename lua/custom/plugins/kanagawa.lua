@@ -3,7 +3,7 @@ return {
 
   -- Default options:
   require('kanagawa').setup {
-    compile = false, -- enable compiling the colorscheme
+    compile = true, -- enable compiling the colorscheme
     undercurl = true, -- enable undercurls
     commentStyle = { italic = true },
     functionStyle = {},
@@ -30,11 +30,12 @@ return {
       return {
         CursorLineNr = { fg = '#939ab7', bold = true },
         SnacksIndent = { fg = '#302d2a' },
+        Comment = { fg = '#474644' },
       }
     end,
-    theme = 'wave', -- Load "wave" theme
+    theme = 'dragon', -- Load "wave" theme
     background = { -- map the value of 'background' option to a theme
-      dark = 'wave', -- try "dragon" !
+      dark = 'dragon', -- try "dragon" !
       light = 'lotus',
     },
   },
