@@ -304,7 +304,7 @@ require('lazy').setup({
   -- after the plugin has been loaded:
   --  config = function() ... end
 
-  { -- Useful plugin to show you pending keybinds.
+  {                     -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     opts = {
@@ -347,7 +347,7 @@ require('lazy').setup({
 
       -- Document existing key chains
       spec = {
-        { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
+        { '<leader>c', group = '[C]ode',     mode = { 'n', 'x' } },
         { '<leader>d', group = '[D]ocument' },
         { '<leader>r', group = '[R]ename' },
         { '<leader>s', group = '[S]earch' },
@@ -387,7 +387,7 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons',            enabled = vim.g.have_nerd_font },
     },
     config = function()
       local ts = require 'telescope'
@@ -509,7 +509,7 @@ require('lazy').setup({
       },
     },
   },
-  { 'Bilal2453/luvit-meta', lazy = true },
+  { 'Bilal2453/luvit-meta',          lazy = true },
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
@@ -521,7 +521,7 @@ require('lazy').setup({
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {} },
+      { 'j-hui/fidget.nvim',       opts = {} },
 
       -- Allows extra capabilities provided by nvim-cmp
       'hrsh7th/cmp-nvim-lsp',
@@ -676,23 +676,83 @@ require('lazy').setup({
       --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+      local lspconfig = require 'lspconfig'
+      local util = lspconfig.util
       local servers = {
-        -- gopls = {},
-        -- pyright = {},
-        verible = {},
-        --cssls = {},
+        pyright = {},
         clangd = {},
-        --css_variables = {},
-        --cssmodules_ls = {},
         html = {},
-        -- rust_analyzer = {},
+        vtsls = {
+          filetypes = { "typescript", "typescriptreact", "javascript", "javascriptreact", "vue" },
+          -- Init options for the Vue TS plugin (adjust location if needed)
+          init_options = {
+            plugins = {
+              {
+                name = "@vue/typescript-plugin",
+                location = vim.fn.stdpath("data") ..
+                    "/mason/packages/vue-language-server/node_modules/@vue/language-server",
+                languages = { "vue" },
+              },
+            },
+          },
+          settings = {
+            typescript = {
+              inlayHints = {
+                includeInlayParameterNameHints = "all",
+                includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayVariableTypeHints = true,
+                includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayEnumMemberValueHints = true,
+              },
+            },
+            vue = {
+              inlayHints = {
+                destructuredProps = { enabled = true },
+                inlineHandlerLoading = { enabled = true },
+                missingProps = { enabled = true },
+                optionsWrapper = { enabled = true },
+                vBindShorthand = { enabled = true },
+              },
+            },
+          },
+        },
+        cssls = {
+          filetypes = { "css", "scss", "less" },
+          settings = {
+            css = {
+              validate = true,
+              lint = {
+                unknownAtRules = "warning",
+                duplicateProperties = "warning",
+              },
+              completion = {
+                completeProperties = true
+              }
+            },
+            less = {
+              validate = true
+            },
+            scss = {
+              validate = true
+            },
+          },
+        },
+        -- ts_ls = {
+        --   root_dir = function(fname)
+        --     return util.root_pattern('package.json', 'tsconfig.json', '.git')(fname) or vim.loop.cwd()
+        --   end,
+        --   single_file_support = true,
+        -- },
+
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
-        ts_ls = {},
         --
 
         lua_ls = {
@@ -725,22 +785,41 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
       })
-      require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+      --require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+      require('mason-lspconfig').setup {
+        ensure_installed = vim.tbl_keys(servers),
+        automatic_installation = true, -- optional
+      }
       --require('java').setup()
 
+      -- require('mason-lspconfig').setup {
+      --   handlers = {
+      --     function(server_name)
+      --       local server = servers[server_name] or {}
+      --       -- This handles overriding only values explicitly passed
+      --       -- by the server configuration above. Useful when disabling
+      --       -- certain features of an LSP (for example, turning off formatting for ts_ls)
+      --       server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+      --       require('lspconfig')[server_name].setup(server)
+      --     end,
+      --   },
+      -- }
       require('mason-lspconfig').setup {
         handlers = {
           function(server_name)
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for ts_ls)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
+            -- Get user-custom server config if any
+            local opts = servers[server_name] or {}
+            -- Merge in global capabilities
+            opts.capabilities = vim.tbl_deep_extend('force', {}, capabilities, opts.capabilities or {})
+
+            -- Define / configure the server via the new API
+            vim.lsp.config(server_name, opts)
+
+            -- Then enable it so it will start when opening appropriate buffers
+            vim.lsp.enable(server_name)
           end,
         },
       }
-      require('lspconfig').jdtls.setup {}
     end,
   },
 
@@ -918,6 +997,7 @@ require('lazy').setup({
   { 'sainnhe/gruvbox-material' },
   { 'rebelot/kanagawa.nvim' },
   { 'AlexvZyl/nordic.nvim' },
+  { 'Mofiqul/dracula.nvim' },
   { 'rose-pine/neovim' },
   { 'vague2k/vague.nvim' },
   { 'folke/tokyonight.nvim' },
@@ -938,8 +1018,8 @@ require('lazy').setup({
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
 
-      -- Tokyo night
-      --vim.cmd.colorscheme 'tokyonight-night'
+      -- Dracula
+      vim.cmd.colorscheme 'dracula'
 
       -- Gruvbox
       -- vim.g.gruvbox_material_enable_italic = true
@@ -952,7 +1032,7 @@ require('lazy').setup({
       --vim.cmd.colorscheme 'kanagawa-dragon'
 
       -- Zenbones
-      vim.cmd.colorscheme 'neobones'
+      --vim.cmd.colorscheme 'neobones'
 
       -- Everforest
 
@@ -1110,7 +1190,7 @@ vim.o.signcolumn = 'yes:1'
 -- code folding options
 require('ufo').setup()
 vim.o.foldcolumn = '0' -- '0' is not bad
-vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+vim.o.foldlevel = 99   -- Using ufo provider need a large value, feel free to decrease the value
 vim.o.foldlevelstart = 99
 vim.o.foldenable = true
 
@@ -1131,10 +1211,15 @@ end
 -- Choose and set your theme here
 if vim.opt.background:get() == 'dark' then
   --vim.cmd 'colorscheme kanagawa-dragon'
-  vim.cmd 'colorscheme catppuccin'
+  vim.cmd 'colorscheme kanagawa'
+  --vim.cmd 'colorscheme dracula'
+  --vim.cmd 'colorscheme catppuccin'
   -- Below settings for catppuccin
 
-  vim.api.nvim_set_hl(0, 'Comment', { fg = '#6c7086' })
+  -- Below is for Kanagawa
+  vim.api.nvim_set_hl(0, 'Comment', { fg = '#454857' })
+  vim.api.nvim_set_hl(0, 'CursorLineNr', { fg = '#b7bdf8', bold = true })
+  vim.api.nvim_set_hl(0, 'SnacksIndent', { fg = '#454857' })
 
   -- Below settings for zenbones
   -- vim.cmd 'colorscheme zenbones'

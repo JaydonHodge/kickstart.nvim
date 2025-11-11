@@ -8,8 +8,10 @@ end
 local function set_dark_theme()
   vim.opt.background = 'dark'
   --vim.cmd 'colorscheme kanagawa-dragon'
+  vim.cmd 'colorscheme kanagawa'
   --vim.cmd 'colorscheme zenbones'
-  vim.cmd 'colorscheme catppuccin'
+  --vim.cmd 'colorscheme catppuccin'
+  --vim.cmd 'colorscheme dracula'
 end
 
 -- Function to toggle between light and dark modes
@@ -17,7 +19,7 @@ local function toggle_theme()
   if vim.o.background == 'dark' then
     set_light_theme()
     -- Below is for catppuccin
-    vim.api.nvim_set_hl(0, 'Special', { fg = '#5c71a4' })
+    --vim.api.nvim_set_hl(0, 'Special', { fg = '#5c71a4' })
 
     --vim.api.nvim_set_hl(0, 'Number', { fg = '#cc859e' })
     -- vim.api.nvim_set_hl(0, 'Number', { fg = '#b577aa' })
@@ -28,12 +30,16 @@ local function toggle_theme()
   else
     set_dark_theme()
     -- Below is for catppuccin
-    vim.api.nvim_set_hl(0, 'Comment', { fg = '#6c7086' })
+    --vim.api.nvim_set_hl(0, 'Comment', { fg = '#6c7086' })
+
+    vim.api.nvim_set_hl(0, 'CursorLineNr', { fg = '#b7bdf8', bold = true })
+    vim.api.nvim_set_hl(0, 'Comment', { fg = '#454857' })
+    vim.api.nvim_set_hl(0, 'SnacksIndent', { fg = '#454857' })
 
     --Below is for zenbones
     -- vim.api.nvim_set_hl(0, 'Number', { fg = '#ac7085' }) -- For neobones
     -- vim.api.nvim_set_hl(0, 'String', { fg = '#6d7d73' })
-    -- vim.api.nvim_set_hl(0, 'Comment', { fg = '#524c49' })
+    --vim.api.nvim_set_hl(0, 'Comment', { fg = '#524c49' })
     -- vim.api.nvim_set_hl(0, 'Constant', { fg = '#6b8e9c', italic = true })
 
     --vim.api.nvim_set_hl(0, 'Comment', { fg = '#524c49' })

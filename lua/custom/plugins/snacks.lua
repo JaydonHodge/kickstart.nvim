@@ -8,7 +8,7 @@ return {
       indent = {
         enabled = true,
         char = '⎪',
-        only_scope = true,
+        --only_scope = true,
         hl = 'SnacksIndent',
       },
       -- block = {
